@@ -1,0 +1,61 @@
+<html>
+  <head>
+    <style>
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+    </style>
+  </head>
+
+  <body></body>
+
+  <script src="js/lib/p5.js"></script>
+  <script src="js/dispatchOrders.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/delivery.js"></script>
+  <script src="js/kitchen.js"></script>
+  <script src="js/courier.js"></script>
+  <script src="js/order.js"></script>
+  <script src="js/courierNetwork.js"></script>
+  <script src="js/orderProcessor.js"></script>
+
+  <script>
+
+    // constants
+    const ui = new Ui();
+    const op = new OrderProcessor({
+      orderData: DISPATCH_ORDERS,
+      kitchen: new Kitchen(),                // can define specific kitchen, if desired
+      courierNetwork: new CourierNetwork(),  // can define specific network, if desired
+      strategy: 0                            // 0 = FIFO / 1 = MATCHING
+    });
+
+    // setup() is a p5 function that only runs once, akin to a constructor
+    function setup() {
+      createCanvas(window.innerWidth, window.innerHeight);
+
+      // op.ingestOrders() is what starts running everything, it is in UI so we have a way to run
+      // things via a button
+      ui.setup();
+    }
+
+    // draw() is a p5 function that runs every frame
+    function draw() {
+      background(220);
+
+      ui.render();
+
+      // updates the state of Orders and Couriers
+      if (op.runComplete) {
+        ui.showAnalytics();
+      } else {
+        op.update();
+      }
+    }
+
+  </script>
+</html>
