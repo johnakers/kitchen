@@ -2,7 +2,8 @@
 
 _Kitchen_ is a small, browser based, system that simulates the fulfillment of delivery orders for a kitchen.
 
-It can be viewed at [johnakers.net/kitchen](https://johnakers.net/kitchen)
+It can be viewed at [johnakers.net/kitchen](https://johnakers.net/kitchen). An example run can be viewed
+[here](https://www.youtube.com/watch?v=dKQhpW7ZWuU) (sorry for the music, I blame OBS).
 
 ```
 - Two (2) Orders are processed every one (1) second
