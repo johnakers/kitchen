@@ -8,7 +8,7 @@ class Order {
     this.readyAt = null;
     this.pickedUpAt = null;
 
-    // solely for drawing purposes
+    // default values, solely for drawing purposes
     this.x = 10;
     this.y = 20;
   }

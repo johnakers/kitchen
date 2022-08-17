@@ -5,7 +5,7 @@ class Kitchen {
 
   addOrder(order) {
     this.orders[order.id] = order;
-    order.kitchen = this; // question mark
+    order.kitchen = this;
     ui.log(`order ${order.id} being prepared. prep time: ${order.prepTime}`);
     this.prep(order);
   }

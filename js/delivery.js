@@ -13,8 +13,11 @@ class Delivery {
     };
   }
 
+  // same logic as in Courier#_getRandomId()
+  // this is fine in 2 spots, but any more, extract this into function we can use for muultiple
+  // objects
   _getRandomId() {
-    let letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
+    let letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'];
     let randomLetter = letters[Math.floor(Math.random() * letters.length)];
     let randomNumber = Math.floor(Math.random() * 10000);
 

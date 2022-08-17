@@ -7,6 +7,10 @@ class Courier {
     this.state = 0;
     this.pickedUpAt = null;
     this.possessOrderId = null;
+
+    // for drawing purposes only
+    this.x = window.innerWidth - 10;
+    this.y = 10;
   }
 
   get states() {
@@ -44,9 +48,9 @@ class Courier {
   }
 
   _getRandomId() {
-    let letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i'];
+    let letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'];
     let randomLetter = letters[Math.floor(Math.random() * letters.length)];
-    let randomNumber = Math.floor(Math.random() * 10000);
+    let randomNumber = Math.floor(Math.random() * 100000);
 
     return `c_${randomLetter}${randomNumber}`;
   }

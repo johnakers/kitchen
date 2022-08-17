@@ -1,11 +1,15 @@
 <html>
   <head>
+    <meta charset="utf-8" />
+    <title>Kitchen by John Akers</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
 
       html,
       body {
         margin: 0;
         padding: 0;
+        overflow: hidden;
       }
 
     </style>
@@ -13,7 +17,10 @@
 
   <body></body>
 
+  <!-- libs -->
   <script src="js/lib/p5.js"></script>
+
+  <!-- files -->
   <script src="js/dispatchOrders.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/delivery.js"></script>
@@ -26,7 +33,7 @@
   <script>
 
     // constants
-    const ui = new Ui();
+    const ui = new Ui({ console: true });
     const op = new OrderProcessor({
       orderData: DISPATCH_ORDERS,
       kitchen: new Kitchen(),                // can define specific kitchen, if desired
@@ -38,8 +45,12 @@
     function setup() {
       createCanvas(window.innerWidth, window.innerHeight);
 
-      // op.ingestOrders() is what starts running everything, it is in UI so we have a way to run
-      // things via a button
+      // set to 30fps
+      frameRate(ui.frameRate);
+
+      // op.ingestOrders() is what starts running everything
+      // it is in UI so we have a way to run things
+      // via a button click
       ui.setup();
     }
 
@@ -47,14 +58,11 @@
     function draw() {
       background(220);
 
+      // draws the updated state of the Ui, every frame
       ui.render();
 
       // updates the state of Orders and Couriers
-      if (op.runComplete) {
-        ui.showAnalytics();
-      } else {
-        op.update();
-      }
+      op.update();
     }
 
   </script>

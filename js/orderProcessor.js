@@ -25,22 +25,27 @@ class OrderProcessor {
     return this.runStates[this.state];
   }
 
-  // mocks an order coming in, every 2 seconds
+  // mocks receiving 2 orders, per second
   ingestOrders() {
     this.startedAt = new Date();
+    this.state = 1;
 
     this.ingestOrderInterval = setInterval(function (e) {
-      if (!this.orderData.length) {
-        ui.log('*** All order ingested ***')
+      if (this.orderData.length <= 0) {
+        ui.log('************ All order ingested ************');
         clearInterval(this.ingestOrderInterval);
-        return
+        return;
       }
 
+      // 2 orders per second
       let data = this.orderData.shift();
-      ui.log(`ingesting order ${data.id}`)
-
+      ui.log(`ingesting order ${data.id}`);
       this.processOrder(data);
-    }.bind(this), 2000);
+
+      let data2 = this.orderData.shift();
+      ui.log(`ingesting order ${data2.id}`);
+      this.processOrder(data2);
+    }.bind(this), 1000);
   }
 
   processOrder(orderData) {
@@ -48,14 +53,18 @@ class OrderProcessor {
     this.kitchen.addOrder(order);
 
     let courier = this.courierNetwork.createCourier();
+
     // if matched, assign order to specific courier
-    courier.dispatch()
+    if (this.strategy === 1) {
+      courier.orderId = order.id;
+    }
+
+    courier.dispatch();
   }
 
   update() {
     this._updateDeliveries();
     this._updateCouriers();
-    this._updateCompletion();
   }
 
   _updateDeliveries() {
@@ -66,7 +75,7 @@ class OrderProcessor {
 
       // if an order has already been picked up, skip
       // consider moving into readyOrders queue
-      if (order.pickedUpAt) {
+      if (order?.pickedUpAt) {
         continue;
       }
 
@@ -78,11 +87,29 @@ class OrderProcessor {
 
         // assign ready orders to couriers
         for (let courierId in this.courierNetwork.arrivedCouriers) {
-          // TODO: if matching logic, courier can only pick up specific order
           let courier = this.courierNetwork.arrivedCouriers[courierId];
 
           // edge case check around "delete"
+          // if a courier has not been removed (already picked up an order)
+          // they could pick up 2 orders... which isn't a thing
           if (courier.state >= 2) {
+            continue;
+          }
+
+          // if we're matching orders to couriers
+          // and the order doesn't match what the courier is supposed to pickup
+          // go to next courier
+          if (this.strategy === 1 && courier.orderId !== order.id) {
+            continue;
+          }
+
+          // edge case check ---
+          // in FIFO... a Courier can try to pick up an Order that has already been picked up
+          // even though Deliveries are correct, they weren't being removed from
+          // this.kitchen.orders correctly
+          // need more time to dig into it, but I believe its somewhat related to p5 running every
+          // frame
+          if (this.kitchen.orders[id] === undefined) {
             continue;
           }
 
@@ -92,13 +119,15 @@ class OrderProcessor {
           this.completedDeliveries[delivery.id] = delivery;
           this._logDelivery({ courier: courier, delivery: delivery, order: order });
 
-          // remove from arrived, as it has bee delivered
+          // remove courier from arrived, as it has been delivered
           // remove order as it is no longer in the kitchen
           delete this.courierNetwork.arrivedCouriers[courierId];
           delete this.kitchen.orders[id];
         }
       }
     }
+
+    this._updateCompletion();
   }
 
   _logDelivery(data) {
@@ -110,17 +139,19 @@ class OrderProcessor {
     for (let i = 0; i < this.courierNetwork.inTransitCouriers.length; i++) {
       let courier = this.courierNetwork.inTransitCouriers[i];
 
-      // remove from intransit
-
       if (courier.state == 1) {
         this.courierNetwork.arrivedCouriers[courier.id] = courier;
+
+        let courierIndex = this.courierNetwork.inTransitCouriers.indexOf(courier);
+        this.courierNetwork.inTransitCouriers.splice(courierIndex, 1);
       }
     }
   }
 
   _updateCompletion() {
-    if (Object.keys(this.completedDeliveries).length === this.numberOfOrders) {
-      // debugger
+    if (Object.keys(this.completedDeliveries).length === this.numberOfOrders && !this.endedAt) {
+      this.state = 2;
+      this.endedAt = new Date();
     }
   }
 }
