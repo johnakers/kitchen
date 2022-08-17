@@ -22,6 +22,8 @@ and should work just fine with all modern browsers.
 It can be run without an internet connection as the dependencies it has, are included as minified .js
 files.
 
+If you would like to change the orders, that can be found in `/js/dispatchOrders.js`.
+
 ### How it works
 
 To run either strategy, simply click `RUN MATCHING` or `RUN FIFO`. By default, logs will be in the
